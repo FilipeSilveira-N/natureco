@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Leaflet Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Advanced Leaflet Map</h1>
+    <div id="map"></div>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Initialize the map
+        var map = L.map('map').setView([51.505, -0.09], 13);
+
+        // Base layers
+        var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
+
+        var satellite = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.opentopomap.org/">OpenTopoMap</a>'
+        });
+
+        // Add OpenStreetMap base layer
+        osm.addTo(map);
+
+        // Custom marker with popup
+        var customIcon = L.icon({
+            iconUrl: 'https://leafletjs.com/examples/custom-icons/leaf-green.png',
+            shadowUrl: 'https://leafletjs.com/examples/custom-icons/leaf-shadow.png',
+            iconSize: [38, 95],
+            shadowSize: [50, 64],
+            iconAnchor: [22, 94],
+            shadowAnchor: [4, 62],
+            popupAnchor: [-3, -76]
+        });
+
+        var marker = L.marker([51.5, -0.09], {icon: customIcon}).addTo(map);
+        marker.bindPopup("<b>Hello world!</b><br>I am a custom marker.");
+
+        // Polygon with popup and styling
+        var polygon = L.polygon([
+            [51.509, -0.08],
+            [51.503, -0.06],
+            [51.51, -0.047]
+        ], {
+            color: 'red',
+            fillColor: '#f03',
+            fillOpacity: 0.5
+        }).addTo(map);
+
+        polygon.bindPopup("I am a polygon.");
+
+        // GeoJSON data with custom style and interaction
+        var geojsonData = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [-0.09, 51.509],
+                                [-0.08, 51.503],
+                                [-0.07, 51.51],
+                                [-0.09, 51.509]
+                            ]
+                        ]
+                    },
+                    "properties": {
+                        "name": "Sample GeoJSON Polygon"
+                    }
+                }
+            ]
+        };
+
+        function onEachFeature(feature, layer) {
+            if (feature.properties && feature.properties.name) {
+                layer.bindPopup(feature.properties.name);
+            }
+        }
+
+        var geojsonLayer = L.geoJSON(geojsonData, {
+            style: {
+                color: "blue",
+                weight: 2,
+                opacity: 0.5
+            },
+            onEachFeature: onEachFeature
+        }).addTo(map);
+
+        // Layer control
+        var baseLayers = {
+            "OpenStreetMap": osm,
+            "Satellite": satellite
+        };
+
+        var overlayLayers = {
+            "Custom Marker": marker,
+            "Polygon": polygon,
+            "GeoJSON Layer": geojsonLayer
+        };
+
+        L.control.layers(baseLayers, overlayLayers).addTo(map);
+    </script>
+</body>
+</html>
